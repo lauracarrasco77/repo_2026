@@ -1,3 +1,4 @@
+import React from "react";
 import { browserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Encabezado from "./components/navegacion/Encabezado";
