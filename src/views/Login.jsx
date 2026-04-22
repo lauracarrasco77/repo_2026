@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
-import FormularioLogin from '../componentes/login/FormularioLogin';
+import FormularioLogin from '../components/login/FormularioLogin';
 import {supabase} from "../database/supabaseconfig";
-import "../../App.css"
+import "../App.css"
 
 function Login() {
   const [usuario, setUsuario] = useState("");
@@ -46,7 +46,7 @@ useEffect(() => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
+    
     padding: "20px",
     overflow: "hidden",
   };
