@@ -2,99 +2,138 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
 const ModalEdicionProducto = ({
-    mostrarModalEdicion,
-    setMostrarModalEdicion,
-    productoEditar,
-    manejoCambioInputEdicion,
-    actualizarProducto
+  mostrarModalEdicion,
+  setMostrarModalEdicion,
+  productoEditar,
+  categorias,
+  manejarCambioInputEdicion,
+  manejoCambioArchivoEdicion,
+  actualizarProducto,
 }) => {
-    const [deshabilitar, setDeshabilitar] = useState(false);
+  const [deshabilitado, setDeshabilitado] = useState(false);
 
-    const handleActualizar = async () => {
-        if (deshabilitar) return;
-        setDeshabilitar(true);
-        try {
-            await actualizarProducto();
-        } finally {
-            setDeshabilitar(false);
-        }
-    };
+  const handleActualizar = async () => {
+    if (deshabilitado) return;
+    setDeshabilitado(true);
+    try {
+      await actualizarProducto();
+    } finally {
+      setDeshabilitado(false);
+    }
+  };
 
-    return (
-        <Modal
-            show={mostrarModalEdicion}
-            onHide={() => setMostrarModalEdicion(false)}
-            backdrop="static"
-            keyboard={false}
-            centered
+  return (
+    <Modal
+      show={mostrarModalEdicion}
+      onHide={() => setMostrarModalEdicion(false)}
+      backdrop="static"
+      keyboard={false}
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Editar Producto</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Nombre</Form.Label>
+            <Form.Control
+              type="text"
+              name="nombre_producto"
+              value={productoEditar.nombre_producto}
+              onChange={manejarCambioInputEdicion}
+              placeholder="Ingresa el nombre del producto"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Descripción</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              name="descripcion_producto"
+              value={productoEditar.descripcion_producto}
+              onChange={manejarCambioInputEdicion}
+              placeholder="Ingresa la descripción"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Categoría</Form.Label>
+            <Form.Select
+              name="categoria_producto"
+              value={productoEditar.categoria_producto}
+              onChange={manejarCambioInputEdicion}
+            >
+              <option value="">Seleccione una categoría</option>
+              {categorias?.map((categoria) => (
+                <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                  {categoria.nombre_categoria}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Precio</Form.Label>
+            <Form.Control
+              type="number"
+              step="0.01"
+              min="0"
+              name="precio_venta"
+              value={productoEditar.precio_venta}
+              onChange={manejarCambioInputEdicion}
+              placeholder="Ingresa el precio"
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>Seleccionar imagen</Form.Label>
+            <Form.Control
+              type="file"
+              name="archivo"
+              accept="image/*"
+              onChange={manejoCambioArchivoEdicion}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Label>O URL de imagen</Form.Label>
+            <Form.Control
+              type="text"
+              name="url_imagen"
+              value={productoEditar.url_imagen}
+              onChange={manejarCambioInputEdicion}
+              placeholder="Ingresa URL o selecciona un archivo"
+            />
+          </Form.Group>
+          {/* Vista previa de imagen seleccionada */}
+          {(productoEditar.archivo || productoEditar.url_imagen) && (
+            <div className="text-center mb-3">
+              <img
+                src={productoEditar.archivo ? URL.createObjectURL(productoEditar.archivo) : productoEditar.url_imagen}
+                alt="Vista previa"
+                style={{ maxWidth: "100%", maxHeight: "180px", objectFit: "cover" }}
+              />
+            </div>
+          )}
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
+          Cancelar
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleActualizar}
+          disabled={
+            deshabilitado ||
+            !productoEditar.nombre_producto?.trim() ||
+            !productoEditar.categoria_producto?.toString().trim() ||
+            !productoEditar.precio_venta?.toString().trim() ||
+            (!productoEditar.url_imagen?.trim() && !productoEditar.archivo)
+          }
         >
-            <Modal.Header closeButton>
-                <Modal.Title>Editar Producto</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
-                    <Form.Group className="mb-3" controlId="formNombreProducto">
-                        <Form.Label>Nombre del Producto</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="nombreProducto"
-                            placeholder="Ingrese el nombre del producto"
-                            value={productoEditar.nombreProducto || ''}          
-                            onChange={manejoCambioInputEdicion}
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formDescripcion">
-                        <Form.Label>Descripción</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            rows={3}
-                            name="descripcion"
-                            placeholder="Ingrese la descripción del producto"
-                            value={productoEditar.descripcion || ''}          
-                            onChange={manejoCambioInputEdicion}
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formPrecio">
-                        <Form.Label>Precio</Form.Label>
-                        <Form.Control
-                            type="number"
-                            name="precio"
-                            placeholder="Ingrese el precio"
-                            value={productoEditar.precio || ''}          
-                            onChange={manejoCambioInputEdicion}
-                            min="0"
-                            step="0.01"
-                        />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formImagen">
-                        <Form.Label>URL de Imagen</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="imagen"
-                            placeholder="Ingrese la URL de la imagen"
-                            value={productoEditar.imagen || ''}          
-                            onChange={manejoCambioInputEdicion}
-                        />
-                    </Form.Group>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
-                    Cancelar
-                </Button>
-                <Button 
-                    variant="primary" 
-                    onClick={handleActualizar} 
-                    disabled={!productoEditar.nombreProducto?.trim() || deshabilitar}
-                >
-                    {deshabilitar ? 'Guardando...' : 'Actualizar'}
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    );
+          {deshabilitado ? 'Guardando...' : 'Actualizar'}
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
 };
 
 export default ModalEdicionProducto;

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const ModalEliminacionProducto = ({
+const ModalEliminacionEmpleado = ({
   mostrarModalEliminacion,
   setMostrarModalEliminacion,
-  eliminarProducto,
-  producto,
+  eliminarEmpleado,
+  empleado,
 }) => {
   const [deshabilitado, setDeshabilitado] = useState(false);
 
   const handleEliminar = async () => {
     if (deshabilitado) return;
     setDeshabilitado(true);
-    await eliminarProducto();
+    await eliminarEmpleado();
     setDeshabilitado(false);
   };
 
@@ -25,12 +25,12 @@ const ModalEliminacionProducto = ({
       centered
     >
       <Modal.Header closeButton>
-        <Modal.Title>Eliminar Producto</Modal.Title>
+        <Modal.Title>Eliminar Empleado</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <p>
-          ¿Está seguro que desea eliminar el producto <strong>{producto?.nombre_producto || producto?.nombreProducto}</strong>?
+          ¿Está seguro que desea eliminar al empleado <strong>{empleado?.nombre} {empleado?.apellido}</strong>?
         </p>
       </Modal.Body>
 
@@ -46,4 +46,4 @@ const ModalEliminacionProducto = ({
   );
 };
 
-export default ModalEliminacionProducto;
+export default ModalEliminacionEmpleado;

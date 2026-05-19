@@ -10,7 +10,10 @@ import ModalEliminarCategoria from "../components/categorias/ModalEliminacionCat
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
 
+import { useAuth } from "../context/AuthContext";
+
 const Categorias = () => {
+    const { tienePermiso } = useAuth();
     const [categorias, setCategorias] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -218,16 +221,19 @@ const eliminarCategoria = async () => {
                     <h3><i className="bi-bookmark-plus-fill me-2"></i> Categorías</h3>
                 </Col>
                 <Col xs={3} className="text-end">
-                    <Button onClick={() => setMostrarModal(true)}>
-                        <i className="bi-plus-lg"></i> <span className="d-none d-sm-inline">Nueva</span>
-                    </Button>
+                    {tienePermiso('crear_categorias') && (
+                        <Button onClick={() => setMostrarModal(true)}>
+                            <i className="bi-plus-lg"></i> <span className="d-none d-sm-inline">Nueva</span>
+                        </Button>
+                    )}
                 </Col>
             </Row>
             <hr />
 
             <CuadroBusquedas
                 textoBusqueda={textoBusqueda}
-                manejarCambioBusqueda={manejarBusqueda}
+                manejarCambioBusqueda={(e) => setTextoBusqueda(e.target.value)}
+                placeholder="Buscar por nombre o descripción..."
             />
 
             {textoBusqueda.trim() !== '' && categoriasFiltradas.length === 0 && (
@@ -279,6 +285,7 @@ const eliminarCategoria = async () => {
                             categorias={categoriasPaginadas}
                             abrirModalEdicion={abrirModalEdicion}
                             abrirModalEliminacion={abrirModalEliminacion}
+                            tienePermiso={tienePermiso}
                         />
                     </div>
 
@@ -288,6 +295,7 @@ const eliminarCategoria = async () => {
                             categorias={categoriasPaginadas}
                             abrirModalEdicion={abrirModalEdicion}
                             abrirModalEliminacion={abrirModalEliminacion}
+                            tienePermiso={tienePermiso}
                         />
                     </div>
 
