@@ -7,19 +7,19 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #cdd88d 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3e4d99 0%, #764ba2 100%);
     padding: 20px;
     overflow: hidden;
 }
 
-
+  
 .margen-superior-main {
 margin-top: 50px;
 padding: 20px;
 }
 .color-navbar {
-background-color: #1068db !important;
-background-image: linear-gradient(90deg, #121b96 0%, #2889b6 50%, #2697cc 100%);
+background-color: #9ed772 !important;
+background-image: linear-gradient(90deg, #929612 0%, #28b682 50%, #2697cc 100%);
 }
 .color-texto-marca {
 color: #1e3d87 !important;

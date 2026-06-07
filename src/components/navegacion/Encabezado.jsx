@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
-import logo from "../../assets/logo44.webp";
+import logo from "../../assets/logo.jpg";
 import { supabase } from "../../database/supabaseconfig";
 import { useAuth } from "../../context/AuthContext";
+import ChatIA from "../ia/ChatIA";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
   const location = useLocation(); // Para detectar la ruta actual
   const { tienePermiso, logout, usuario } = useAuth();
+  const [mostrarChatIA, setMostrarChatIA] = useState(false);
 
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
@@ -35,6 +37,7 @@ const Encabezado = () => {
 
   if (esLogin) {
     contenidoMenu = (
+
       <Nav className="ms-auto pe-2">
         <Nav.Link
           onClick={() => manejarNavegacion("/login")}
@@ -81,6 +84,11 @@ const Encabezado = () => {
             <strong>Categorías</strong>
           </Nav.Link>
 )}
+
+<Nav.Link onClick={() => setMostrarChatIA(true)} className="text-white">
+  <i className="bi bi-robot me-2"></i>
+</Nav.Link>
+
 
           
     {tienePermiso('ver_productos') && (
@@ -205,11 +213,12 @@ const Encabezado = () => {
           onHide={() => setMostrarMenu(false)}
         >
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menú Discosa</Offcanvas.Title>
+            <Offcanvas.Title>Menú Laura</Offcanvas.Title>
           </Offcanvas.Header>
 
           <Offcanvas.Body>{contenidoMenu}</Offcanvas.Body>
         </Navbar.Offcanvas>
+        <ChatIA mostrar={mostrarChatIA} onCerrar={() => setMostrarChatIA(false)} />
       </Container>
     </Navbar>
   );

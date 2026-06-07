@@ -1,41 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { Table, Spinner, Button } from "react-bootstrap";
+import React from "react";
+import { Table, Button } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css"; 
 
 const TablaCategorias = ({
   categorias,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
+  generarPDFCategoria
 }) => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (categorias && categorias.length > 0) {
-      setLoading(false);
-    } else {
-      setLoading(true);
-    }
-  }, [categorias]); 
-
   return (
     <>
-      {loading ? (
-        <div className="text-center">
-          <h4>Cargando categorías...</h4>
-          <Spinner animation="border" variant="success" role="status" />
-        </div>
-      ) : (
-        <Table striped borderless hover responsive size="sm">
-          <thead>
+      <Table striped borderless hover responsive size="sm">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th className="d-none d-md-table-cell">Descripción</th>
+            <th className="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {categorias.length === 0 ? (
             <tr>
-              <th>ID</th>
-              <th>Nombre</th>
-              <th className="d-none d-md-table-cell">Descripción</th>
-              <th className="text-center">Acciones</th>
+              <td colSpan={4} className="text-center py-4">
+                No hay categorías para mostrar.
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {categorias.map((categoria) => (
+          ) : (
+            categorias.map((categoria) => (
               <tr key={categoria.id_categoria}>
                 <td>{categoria.id_categoria}</td>
                 <td>{categoria.nombre_categoria}</td>
@@ -56,12 +48,20 @@ const TablaCategorias = ({
                   >
                     <i className="bi bi-trash"></i>
                   </Button>
+                  <Button
+                    variant="outline-primary"
+                    size="sm"
+                    className="m-1"
+                    onClick={() => generarPDFCategoria(categoria)}
+                  >
+                    <i className="bi bi-file-earmark-pdf"></i>
+                  </Button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+            ))
+          )}
+        </tbody>
+      </Table>
     </>
   );
 };

@@ -9,6 +9,11 @@ import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategori
 import ModalEliminarCategoria from "../components/categorias/ModalEliminacionCategoria";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
+import ModalEnvioCorreoCategorias from "../components/categorias/ModalEnvioCorreoCategorias";
+import emailjs from '@emailjs/browser';
+
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { useAuth } from "../context/AuthContext";
 
@@ -25,6 +30,9 @@ const Categorias = () => {
     const [categoriasFiltradas, setCategoriasFiltradas] = useState([]);
     const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
 const [paginaActual, establecerPaginaActual] = useState(1);
+const [mostrarModalCorreo, setMostrarModalCorreo] = useState(false);
+const [emailDestino, setEmailDestino] = useState("");
+const [enviandoCorreo, setEnviandoCorreo] = useState(false);
 
     const [categoriaEditar, setCategoriaEditar] = useState({
         id_categoria: "",
@@ -167,6 +175,35 @@ const eliminarCategoria = async () => {
         }
     };
 
+    const generarPDFCategoria = (categoria) => {
+
+  const doc = new jsPDF();
+
+  // Título
+  doc.setFontSize(18);
+  doc.text("Reporte de Categoría", 14, 20);
+
+  // Línea decorativa
+  doc.line(14, 25, 195, 25);
+
+  // Información de la categoría
+  doc.setFontSize(12);
+
+  autoTable(doc, {
+    startY: 35,
+    head: [["Campo", "Valor"]],
+    body: [
+      ["ID", categoria.id_categoria],
+      ["Nombre", categoria.nombre_categoria],
+      ["Descripción", categoria.descripcion_categoria],
+    ],
+  });
+
+  // Descargar PDF
+  doc.save(`categoria_${categoria.id_categoria}.pdf`);
+};
+
+
     const cargarCategorias = async () => {
         try {
             setCargando(true);
@@ -185,7 +222,11 @@ const eliminarCategoria = async () => {
     };
 
     useEffect(() => {
-        
+      cargarCategorias();
+    }, []);
+
+    useEffect(() => {
+     
   if (!textoBusqueda.trim()) {
     setCategoriasFiltradas(categorias);
   } else {
@@ -213,21 +254,107 @@ const eliminarCategoria = async () => {
         setMostrarModalEliminacion(true);
     };
 
+    // Inicializar EmailJS con la llave pública
+useEffect(() => {
+  emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+}, []);
+
+const abrirModalCorreo = () => {
+  setEmailDestino("");
+  setMostrarModalCorreo(true);
+};
+
+const formatearCategoriasParaCorreo = () => {
+  if (categorias.length === 0) return "No hay categorías registradas.";
+  let texto = `LISTADO DE CATEGORÍAS\n\n`;
+  texto += `Fecha: ${new Date().toLocaleDateString("es-NI")}\n`;
+  texto += `Total de categorías: ${categorias.length}\n\n`;
+  
+  categorias.forEach((cat, index) => {
+    texto += `${index + 1}. ${cat.nombre_categoria}\n`;
+    if (cat.descripcion_categoria) {
+      texto += `   Descripción: ${cat.descripcion_categoria}\n`;
+    }
+    texto += `\n`;
+  });
+  return texto;
+};
+
+const enviarCorreoCategorias = () => {
+  if (!emailDestino.trim()) {
+    setToast({
+      mostrar: true,
+      mensaje: "Por favor ingresa un correo destino.",
+      tipo: "advertencia",
+    });
+    return;
+  }
+  
+  setEnviandoCorreo(true);
+  const mensaje = formatearCategoriasParaCorreo();
+  
+  const templateParams = {
+    to_name: "Administrador",
+    user_email: emailDestino,
+    message: mensaje,
+    fecha_envio: new Date().toLocaleDateString("es-NI")
+  };
+  
+  emailjs.send(
+    import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    templateParams
+  )
+  .then(() => {
+    setToast({
+      mostrar: true,
+      mensaje: "Correo enviado correctamente.",
+      tipo: "exito",
+    });
+    setMostrarModalCorreo(false);
+    setEmailDestino("");
+  })
+  .catch((error) => {
+    console.error("Error EmailJS:", error);
+    setToast({
+      mostrar: true,
+      mensaje: "Error al enviar el correo.",
+      tipo: "error",
+    });
+  })
+  .finally(() => {
+    setEnviandoCorreo(false);
+  });
+};
+
     return (
         <Container>
             <br />
-            <Row className="align-items-center mb-3">
-                <Col xs={9}>
-                    <h3><i className="bi-bookmark-plus-fill me-2"></i> Categorías</h3>
-                </Col>
-                <Col xs={3} className="text-end">
-                    {tienePermiso('crear_categorias') && (
-                        <Button onClick={() => setMostrarModal(true)}>
-                            <i className="bi-plus-lg"></i> <span className="d-none d-sm-inline">Nueva</span>
-                        </Button>
-                    )}
-                </Col>
-            </Row>
+            
+<Row className="align-items-center mb-3">
+  <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
+    <h3 className="mb-0">
+      <i className="bi-bookmark-plus-fill me-2"></i> Categorías
+    </h3>
+  </Col>
+  <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+    <Button variant="primary" onClick={abrirModalCorreo} size="md">
+      <i className="bi bi-envelope"></i>
+      <span className="d-none d-lg-inline ms-2">Enviar por Correo</span>
+    </Button>
+  </Col>
+  <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+    <Button
+      onClick={() => setMostrarModal(true)}
+      size="md"
+    >
+      <i className="bi-plus-lg"></i>
+      <span className="d-none d-lg-inline ms-2">Nueva Categoría</span>
+    </Button>
+  </Col>
+</Row>
+
+            
             <hr />
 
             <CuadroBusquedas
@@ -266,6 +393,16 @@ const eliminarCategoria = async () => {
                 categoria={categoriaAEliminar}
             />
 
+            <ModalEnvioCorreoCategorias
+  mostrarModalCorreo={mostrarModalCorreo}
+  setMostrarModalCorreo={setMostrarModalCorreo}
+  emailDestino={emailDestino}
+  setEmailDestino={setEmailDestino}
+  enviandoCorreo={enviandoCorreo}
+  enviarCorreoCategorias={enviarCorreoCategorias}
+  totalCategorias={categorias.length}
+/>
+
             <NotificacionOperacion
                 mostrar={toast.mostrar}
                 mensaje={toast.mensaje}
@@ -291,12 +428,12 @@ const eliminarCategoria = async () => {
 
                     {/* Vista Escritorio */}
                     <div className="d-none d-lg-block">
-                        <TablaCategorias
-                            categorias={categoriasPaginadas}
-                            abrirModalEdicion={abrirModalEdicion}
-                            abrirModalEliminacion={abrirModalEliminacion}
-                            tienePermiso={tienePermiso}
-                        />
+                       <TablaCategorias
+  categorias={categoriasPaginadas}
+  abrirModalEdicion={abrirModalEdicion}
+  abrirModalEliminacion={abrirModalEliminacion}
+  generarPDFCategoria={generarPDFCategoria}
+/>
                     </div>
 
                     {categorias.length === 0 && <p className="text-center">No hay datos.</p>}
