@@ -12,6 +12,7 @@ import Empleados from "./views/Empleados";
 import Clientes from "./views/Clientes";
 import Pagina404 from "./views/Pagina404";
 import Permisos from "./views/Permisos";
+import Ventas from "./views/Ventas";
 
 import "./App.css"
 
