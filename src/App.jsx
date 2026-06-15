@@ -22,7 +22,7 @@ const App = () => {
     <Router>
       <Encabezado />
       
-      <main className="margen-superior-main">
+      <main className="margen-superior-main"> 
         <Routes>
           <Route path="/login" element={<Login/>} />
           
@@ -30,6 +30,7 @@ const App = () => {
           <Route path="/categorias" element={<RutaProtegida><Categorias /></RutaProtegida>} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/productos" element={<RutaProtegida><Productos /></RutaProtegida>} />
+          <Route path="/ventas" element={<RutaProtegida><Ventas /></RutaProtegida>} />
           <Route path="/permisos" element={<RutaProtegida><Permisos /></RutaProtegida>} />
           <Route path="/empleados" element={<RutaProtegida><Empleados /></RutaProtegida>} />
           <Route path="/clientes" element={<RutaProtegida><Clientes /></RutaProtegida>} />
@@ -42,4 +43,3 @@ const App = () => {
 }
 
 export default App;
-
